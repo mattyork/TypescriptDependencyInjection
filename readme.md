@@ -13,31 +13,32 @@ Dependency Injection for Typescript. Inspired by [di.js](https://github.com/angu
 
 Only three touch points: `@Injectable`, `new Injector`, `Injector#getInstance`
 
-    import Injector, { Injectable } from './index';
+```typescript
+import Injector, { Injectable } from './index';
 
-    @Injectable
-    class KlassA {}
+@Injectable
+class KlassA {}
 
-    @Injectable
-    class KlassB {
-      constructor(public dependency: KlassA) {}
-    }
+@Injectable
+class KlassB {
+  constructor(public dependency: KlassA) {}
+}
 
-    let injector = new Injector();
-    let b = injector.getInstance(KlassB);
-    let a = injector.getInstance(KlassA);
-    assert(b.dependency === a);
-    assert(b === injector.getInstance(B));
+let injector = new Injector();
+let b = injector.getInstance(KlassB);
+let a = injector.getInstance(KlassA);
+assert(b.dependency === a);
+assert(b === injector.getInstance(B));
 
-    @Injectable
-    class MockKlassA {}
+@Injectable
+class MockKlassA {}
 
-    let overrides = new Map<any, any>();
-    overrides.set(KlassA, MockKlassA);
-    let injector = new Injector(overrides);
-    let b = injector.getInstance(KlassB);
-    assert(b.dependency instanceof MockKlassA)
-
+let overrides = new Map<any, any>();
+overrides.set(KlassA, MockKlassA);
+let injector = new Injector(overrides);
+let b = injector.getInstance(KlassB);
+assert(b.dependency instanceof MockKlassA)
+```
 See tests.js for more examples
 
 # API
@@ -51,66 +52,78 @@ Use to decorate classes that will be instantiated through `Injector#getInstance`
 
 `Injector#getInstance` will throw if it encounters objects without this decorator.
 
-    @Injectable
-    class Klass {
-      constructor(injectableDependency: InjectableDependency) {}
-    }
+```typescript
+@Injectable
+class Klass {
+  constructor(injectableDependency: InjectableDependency) {}
+}
+```
 
 ## `Injector`
 
-    interface Injector {
-      new(overrides?: Map<Newable<any>, any>): Injector;
-      getInstance<T>(Newable<T>): T;
-    }
+```typescript
+interface Injector {
+  new(overrides?: Map<Newable<any>, any>): Injector;
+  getInstance<T>(Newable<T>): T;
+}
+```
 
 `Injector` will create at most one instance of each requested `@Injectable`:
 
-    @Injectable
-    class A {}
-    let inj = new Injector();
-    assert(inj.getInstance(A) === inj.getInstance(A));
+```typescript
+@Injectable
+class A {}
+let inj = new Injector();
+assert(inj.getInstance(A) === inj.getInstance(A));
+```
 
 Each instance of Injector keeps its own instance cache:
 
-    @Injectable
-    class A {}
-    let inj1 = new Injector();
-    let inj2 = new Injector();
-    assert(inj1.getInstance(A) !== inj2.getInstance(A));
+```typescript
+@Injectable
+class A {}
+let inj1 = new Injector();
+let inj2 = new Injector();
+assert(inj1.getInstance(A) !== inj2.getInstance(A));
+```
 
 `Injector` instantiates lazily and will follow the whole dependency tree:
 
-    @Injectable
-    class Fur {
-      constructor() {
-        console.log('Fur');
-      }
-    }
+```typescript
+@Injectable
+class Fur {
+  constructor() {
+    console.log('Fur');
+  }
+}
 
-    @Injectable
-    class Sasquatch {
-      constructor(fur: Fur) {
-        console.log('Sasquatch');
-      }
-    }
-    let inj = new Injector();
-    inj.getInstance(Sasquatch);
-    // > Sasquatch
-    // > Fur
+@Injectable
+class Sasquatch {
+  constructor(fur: Fur) {
+    console.log('Sasquatch');
+  }
+}
+let inj = new Injector();
+inj.getInstance(Sasquatch);
+// > Sasquatch
+// > Fur
+```
 
 `Injector` bindings can be overridden at construction time
 
-    @Injectable
-    class KlassA {}
+```typescript
+@Injectable
+class KlassA {}
 
-    @Injectable
-    class MockKlassA {}
+@Injectable
+class MockKlassA {}
 
-    let overrides = new Map<any, any>();
-    overrides.set(KlassA, MockKlassA);
-    let injector = new Injector(overrides);
-    let a = injector.getInstance(KlassA);
-    assert(a instanceof MockKlassA)
+let overrides = new Map<any, any>();
+overrides.set(KlassA, MockKlassA);
+let injector = new Injector(overrides);
+let a = injector.getInstance(KlassA);
+assert(a instanceof MockKlassA)
+```
 
 # Build and Test
 
