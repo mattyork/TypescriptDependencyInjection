@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "module": "commonjs",
+        "target": "ES5"
+    },
+    "files": [
+        "index.ts",
+        "tests.ts"
+    ]
+}

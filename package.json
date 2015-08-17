@@ -1,0 +1,24 @@
+{
+  "name": "TypescriptDependencyInjection",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "all": "npm run clean && npm run build && npm run test && npm run test-browser",
+    "build": "tsc",
+    "clean": "rm -f *.js",
+    "test": "node_modules/.bin/mocha tests.js",
+    "test-browser": "webpack tests.js browser-tests.js && open browser-tests.html"
+  },
+  "author": "Matt York",
+  "license": "ISC",
+  "dependencies": {
+    "reflect-metadata": "^0.1.0"
+  },
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "mocha": "^2.2.5",
+    "typescript": "^1.5.3",
+    "webpack": "^1.11.0"
+  }
+}
