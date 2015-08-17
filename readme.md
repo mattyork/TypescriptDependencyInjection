@@ -11,14 +11,14 @@ Dependency Injection for Typescript. Inspired by [di.js](https://github.com/angu
 
 # Quick Start
 
-Only three touch points: `\@Injectable`, `new Injector`, `Injector#getInstance`
+Only three touch points: `@Injectable`, `new Injector`, `Injector#getInstance`
 
     import Injector, { Injectable } from './index';
 
-    \@Injectable
+    @Injectable
     class KlassA {}
 
-    \@Injectable
+    @Injectable
     class KlassB {
       constructor(public dependency: KlassA) {}
     }
@@ -29,7 +29,7 @@ Only three touch points: `\@Injectable`, `new Injector`, `Injector#getInstance`
     assert(b.dependency === a);
     assert(b === injector.getInstance(B));
 
-    \@Injectable
+    @Injectable
     class MockKlassA {}
 
     let overrides = new Map<any, any>();
@@ -42,16 +42,16 @@ See tests.js for more examples
 
 # API
 
-There is at most one instance of each `\@Injectable` per `Injector` instance.
+There is at most one instance of each `@Injectable` per `Injector` instance.
 All objects are instantiated lazily (i.e. when they are first requested).
 
-## `\@Injectable`
+## `@Injectable`
 
 Use to decorate classes that will be instantiated through `Injector#getInstance`
 
 `Injector#getInstance` will throw if it encounters objects without this decorator.
 
-    \@Injectable
+    @Injectable
     class Klass {
       constructor(injectableDependency: InjectableDependency) {}
     }
@@ -63,16 +63,16 @@ Use to decorate classes that will be instantiated through `Injector#getInstance`
       getInstance<T>(Newable<T>): T;
     }
 
-`Injector` will create at most one instance of each requested `\@Injectable`:
+`Injector` will create at most one instance of each requested `@Injectable`:
 
-    \@Injectable
+    @Injectable
     class A {}
     let inj = new Injector();
     assert(inj.getInstance(A) === inj.getInstance(A));
 
 Each instance of Injector keeps its own instance cache:
 
-    \@Injectable
+    @Injectable
     class A {}
     let inj1 = new Injector();
     let inj2 = new Injector();
@@ -80,14 +80,14 @@ Each instance of Injector keeps its own instance cache:
 
 `Injector` instantiates lazily and will follow the whole dependency tree:
 
-    \@Injectable
+    @Injectable
     class Fur {
       constructor() {
         console.log('Fur');
       }
     }
 
-    \@Injectable
+    @Injectable
     class Sasquatch {
       constructor(fur: Fur) {
         console.log('Sasquatch');
@@ -100,10 +100,10 @@ Each instance of Injector keeps its own instance cache:
 
 `Injector` bindings can be overridden at construction time
 
-    \@Injectable
+    @Injectable
     class KlassA {}
 
-    \@Injectable
+    @Injectable
     class MockKlassA {}
 
     let overrides = new Map<any, any>();
