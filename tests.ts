@@ -102,11 +102,12 @@ describe('Injector', () => {
   })
 
   it('should allow overriding an injectable type', () => {
-    let overrideMap = new Map<any, any>()
-    overrideMap.set(FirstInjectable, MockFirstInjectable)
-    overrideMap.set(ThirdInjectable, MockThirdInjectable)
-    let injector = new Injector(overrideMap)
-    let injected = injector.getInstance(ThirdInjectable)
+    let overrides = [
+      { key: FirstInjectable, val: MockFirstInjectable },
+      { key: ThirdInjectable, val: MockThirdInjectable }
+    ];
+    let injector = new Injector(overrides);
+    let injected: ThirdInjectable = injector.getInstance(ThirdInjectable)
     expect(injected, 'injected').instanceof(MockThirdInjectable)
     expect(injected.argFirstInjectable, 'first arg of injected').instanceof(MockFirstInjectable)
     expect(injected.argSecondInjectable, 'second arg of injected').instanceof(SecondInjectable)

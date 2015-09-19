@@ -7,31 +7,47 @@ interface Newable<T> {
   new(...args: any[]): T
 }
 
-function Injectable<T>(target: Newable<T>) {
-  // This is only needed to force typescript to emit type metadata on the contructor
-  Reflect.defineMetadata('DI:injectable', true, target);
-  return target;
+interface Override {
+  key: Newable<any>,
+  val: Newable<any>
 }
 
-class Injector {
-  private cache: Map<Newable<any>, any>;
-  private explicitBindings: Map<Newable<any>, any>;
+interface Dict<T> {
+  [idx: string]: T
+}
 
-  constructor(explicitBindings: Map<Newable<any>, any> = new Map<Newable<any>, any>()) {
-    this.cache = new Map<Newable<any>, any>();
-    this.explicitBindings = explicitBindings;
+let injectableId = 1;
+
+const injectableTypeKey = '__injectableTypeKey__';
+
+class Injector {
+  private static injectableId = 1;
+  private cache: Dict<any>;
+  private explicitBindings: Dict<Newable<any>>;
+
+  constructor(bindingOverrides: Override[] = []) {
+    this.cache = {};
+    this.explicitBindings = {};
+
+    bindingOverrides.forEach((override: Override) => {
+      let key: string = override.key[injectableTypeKey];
+      this.explicitBindings[key] = override.val;
+    });
   }
 
   getInstance<T>(newable: Newable<T>): T {
-    let cachedInstance = this.cache.get(newable);
+    let newableTypeKey = newable[injectableTypeKey];
+
+    let cachedInstance = this.cache[newableTypeKey];
     if (cachedInstance) {
       return cachedInstance;
     }
 
-    if (this.explicitBindings.has(newable)) {
-      newable = this.explicitBindings.get(newable);
+    if (this.explicitBindings[newableTypeKey]) {
+      newable = this.explicitBindings[newableTypeKey];
     }
-    let dependencies: Newable<any>[] = Reflect.getMetadata("design:paramtypes", newable);
+
+    let dependencies: Newable<any>[] = Reflect.getMetadata('design:paramtypes', newable);
     let args: any[] = [];
     if (dependencies && dependencies.length) {
       args = dependencies.map(dep => {
@@ -50,9 +66,15 @@ class Injector {
     applyArgs = applyArgs.concat(args);
     let constructor = Function.prototype.bind.apply(newable, applyArgs);
     let newInstance = new constructor();
-    this.cache.set(newable, newInstance);
+    this.cache[newableTypeKey] = newInstance;
     return newInstance;
   }
+}
+
+function Injectable<T>(target: Newable<T>) {
+  Reflect.defineMetadata('DI:injectable', true, target);
+  target[injectableTypeKey] = injectableId++;
+  return target;
 }
 
 export {

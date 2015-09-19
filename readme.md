@@ -5,9 +5,9 @@ Dependency Injection for Typescript. Inspired by [di.js](https://github.com/angu
 # Requirements
 
 1. Typescript >= 1.5
-2. Compile with options: `--experimentalDecorators --emitDecoratorMetadata --target ES5`
-3. import [reflect-metadata](https://www.npmjs.com/package/reflect-metadata)
-4. Runtime with ES6 [`Map`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map), or an ES6 Map polyfill that can take Objects as keys.
+2. import [reflect-metadata](https://www.npmjs.com/package/reflect-metadata) in your source
+3. Compile with options: `--experimentalDecorators --emitDecoratorMetadata --target ES5`
+
 
 # Quick Start
 
@@ -33,13 +33,14 @@ assert(b === injector.getInstance(B));
 @Injectable
 class MockKlassA {}
 
-let overrides = new Map<any, any>();
-overrides.set(KlassA, MockKlassA);
+let overrides = [
+  {key: KlassA, val: MockKlassA}
+];
 let injector = new Injector(overrides);
 let b = injector.getInstance(KlassB);
 assert(b.dependency instanceof MockKlassA)
 ```
-See tests.js for more examples
+See `tests.js` for more examples
 
 # API
 
@@ -63,7 +64,7 @@ class Klass {
 
 ```typescript
 interface Injector {
-  new(overrides?: Map<Newable<any>, any>): Injector;
+  new(overrides?: {key: Newable<any>, val: Newable<any>}[]): Injector;
   getInstance<T>(Newable<T>): T;
 }
 ```
@@ -118,8 +119,9 @@ class KlassA {}
 @Injectable
 class MockKlassA {}
 
-let overrides = new Map<any, any>();
-overrides.set(KlassA, MockKlassA);
+let overrides = [
+  {key: KlassA, val: MockKlassA}
+];
 let injector = new Injector(overrides);
 let a = injector.getInstance(KlassA);
 assert(a instanceof MockKlassA)
@@ -130,9 +132,8 @@ assert(a instanceof MockKlassA)
     > npm install
     > npm run all
 
-See the the `scripts` in package.json for finer grained npm scripts
+See the the `scripts` in `package.json` for finer grained npm scripts
 
 # todo
 
-1. Better static typing for bindings overrides. Currently any object can be overridden with anything. Compiler should enforce that objects have same interface.
-2. ES5 compatibility. But Map is so useful...
+1. Better static typing for bindings overrides. Currently any object can be overridden with anything. Compiler should enforce that objects have same interface. Maybe: Use TS 1.6's abstract class to define an @Injectable, have a @DefaultProvider that inherits from the @Injectable abstract class to give default implementation, and have a @Provider for mocks. All @Providers would still need to be passed in to the Injector's constructor.
