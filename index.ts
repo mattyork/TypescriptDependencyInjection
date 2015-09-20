@@ -1,14 +1,14 @@
-/// <reference path="./node_modules/reflect-metadata/reflect-metadata.d.ts" />
-/// <reference path="./node_modules/typescript/bin/lib.es6.d.ts" />
+/// <reference path="node_modules/reflect-metadata/reflect-metadata.d.ts" />
 
 import 'reflect-metadata';
 
 interface Newable<T> {
   new(...args: any[]): T
+  name?: string
 }
 
-interface Override {
-  key: Newable<any>,
+interface InjectableOverride {
+  key: Newable<any>
   val: Newable<any>
 }
 
@@ -16,29 +16,28 @@ interface Dict<T> {
   [idx: string]: T
 }
 
-let injectableId = 1;
+let injectableId: number = 1;
 
-const injectableTypeKey = '__injectableTypeKey__';
+const injectableTypeKey: string = '__injectableTypeKey__';
 
 class Injector {
-  private static injectableId = 1;
   private cache: Dict<any>;
   private explicitBindings: Dict<Newable<any>>;
 
-  constructor(bindingOverrides: Override[] = []) {
+  constructor(bindingOverrides: InjectableOverride[] = []) {
     this.cache = {};
     this.explicitBindings = {};
 
-    bindingOverrides.forEach((override: Override) => {
+    bindingOverrides.forEach((override: InjectableOverride) => {
       let key: string = override.key[injectableTypeKey];
       this.explicitBindings[key] = override.val;
     });
   }
 
   getInstance<T>(newable: Newable<T>): T {
-    let newableTypeKey = newable[injectableTypeKey];
+    let newableTypeKey: string = newable[injectableTypeKey];
 
-    let cachedInstance = this.cache[newableTypeKey];
+    let cachedInstance: T = this.cache[newableTypeKey];
     if (cachedInstance) {
       return cachedInstance;
     }
@@ -50,7 +49,7 @@ class Injector {
     let dependencies: Newable<any>[] = Reflect.getMetadata('design:paramtypes', newable);
     let args: any[] = [];
     if (dependencies && dependencies.length) {
-      args = dependencies.map(dep => {
+      args = dependencies.map((dep: Newable<any>) => {
         if (dep === undefined) {
           throw new Error(`Cannot inject '${newable.name}' because there is no type metadata for a dependency.
             you might have a circular dependency`);
@@ -58,20 +57,20 @@ class Injector {
         return this.getInstance(dep)
       });
     }
-    let isDecoratedWithInject = Reflect.getMetadata('DI:injectable', newable);
+    let isDecoratedWithInject: boolean = Reflect.getMetadata('DI:injectable', newable);
     if (!isDecoratedWithInject) {
       throw new Error(`Cannot inject '${newable.name}' because it is not decorated with @Injectable.`)
     }
     let applyArgs: Newable<any>[] = [newable];
     applyArgs = applyArgs.concat(args);
-    let constructor = Function.prototype.bind.apply(newable, applyArgs);
-    let newInstance = new constructor();
+    let constructor: Newable<T> = Function.prototype.bind.apply(newable, applyArgs);
+    let newInstance: T = new constructor();
     this.cache[newableTypeKey] = newInstance;
     return newInstance;
   }
 }
 
-function Injectable<T>(target: Newable<T>) {
+function Injectable<T>(target: Newable<T>): Newable<T> {
   Reflect.defineMetadata('DI:injectable', true, target);
   target[injectableTypeKey] = injectableId++;
   return target;
@@ -79,5 +78,6 @@ function Injectable<T>(target: Newable<T>) {
 
 export {
   Injectable as default,
-  Injector
+  Injector,
+  InjectableOverride
 }
