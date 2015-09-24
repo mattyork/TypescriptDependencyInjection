@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "all": "npm run clean && npm run build && npm run lint && npm run test && npm run test-browser",
     "build": "node_modules/.bin/tsc",
     "clean": "rm -f *.js",
     "lint": "node_modules/.bin/tslint tests.ts index.ts",
-    "test": "node_modules/.bin/mocha tests.js",
+    "test": "npm run clean && npm run build && npm run lint && npm run test-node",
+    "test-node": "node_modules/.bin/mocha tests.js",
     "test-browser": "webpack tests.js browser-tests.js && open browser-tests.html"
   },
   "author": "Matt York",

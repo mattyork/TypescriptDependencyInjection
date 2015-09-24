@@ -130,7 +130,7 @@ assert(a instanceof MockKlassA)
 # Build and Test
 
     > npm install
-    > npm run all
+    > npm test
 
 See the the `scripts` in `package.json` for finer grained npm scripts
 
