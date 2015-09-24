@@ -2,6 +2,8 @@
 
 Dependency Injection for Typescript. Inspired by [di.js](https://github.com/angular/di.js/), but simpler and strongly typed.
 
+[![Build Status](https://travis-ci.org/mattyork/TypescriptDependencyInjection.svg?branch=master)](https://travis-ci.org/mattyork/TypescriptDependencyInjection)
+
 # Requirements
 
 1. Typescript >= 1.5
